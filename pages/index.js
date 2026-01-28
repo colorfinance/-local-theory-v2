@@ -42,10 +42,10 @@ export default function Dashboard() {
         
         {/* Real Copy Integration from localtheory.com.au approach */}
         <header className="mb-12">
-            <span className="text-lt-primary font-bold text-xs uppercase tracking-[0.3em] mb-3 block">Performance Protocol</span>
-            <h1 className="text-5xl font-black italic tracking-tighter mb-4">LOCAL THEORY DIGITAL</h1>
-            <p className="text-lt-muted max-w-2xl text-lg leading-relaxed font-medium">
-                The Darwin-based digital engine built for aggressive growth. We don't just build websites; we build high-converting conversion machines.
+            <span className="text-lt-primary font-bold text-xs uppercase tracking-[0.3em] mb-3 block">Darwin's Premier Digital Engine</span>
+            <h1 className="text-5xl font-black italic tracking-tighter mb-4 uppercase">Local Theory Digital</h1>
+            <p className="text-lt-muted max-w-3xl text-lg leading-relaxed font-medium">
+                Showcasing custom web apps, bespoke websites, creative content, and digital marketing solutions. Built for businesses looking to thrive online with a modern, futuristic, and professional digital presence.
             </p>
         </header>
         
