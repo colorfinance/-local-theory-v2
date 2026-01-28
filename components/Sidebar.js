@@ -10,19 +10,23 @@ export default function Sidebar() {
       </div>
       
       <nav className="space-y-1">
-        <Link href="/" className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-white bg-lt-surface rounded-md">
+        <Link href="/" className={`flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition ${isActive('/') ? 'text-white bg-lt-surface' : 'text-lt-muted hover:text-white hover:bg-lt-surface/50'}`}>
           <LayoutDashboard size={18} />
           Dashboard
         </Link>
-        <Link href="/projects" className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-lt-muted hover:text-white hover:bg-lt-surface/50 rounded-md transition">
+        <Link href="/projects" className={`flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition ${isActive('/projects') ? 'text-white bg-lt-surface' : 'text-lt-muted hover:text-white hover:bg-lt-surface/50'}`}>
           <CheckSquare size={18} />
           Projects
         </Link>
-        <Link href="/audits" className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-lt-muted hover:text-white hover:bg-lt-surface/50 rounded-md transition">
+        <Link href="/audits" className={`flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition ${isActive('/audits') ? 'text-white bg-lt-surface' : 'text-lt-muted hover:text-white hover:bg-lt-surface/50'}`}>
           <FileText size={18} />
           AI Audits
         </Link>
-        <Link href="/clients" className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-lt-muted hover:text-white hover:bg-lt-surface/50 rounded-md transition">
+        <Link href="/proposals" className={`flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition ${isActive('/proposals') ? 'text-white bg-lt-surface' : 'text-lt-muted hover:text-white hover:bg-lt-surface/50'}`}>
+          <Send size={18} />
+          Proposals
+        </Link>
+        <Link href="/clients" className={`flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition ${isActive('/clients') ? 'text-white bg-lt-surface' : 'text-lt-muted hover:text-white hover:bg-lt-surface/50'}`}>
           <Users size={18} />
           Clients
         </Link>
