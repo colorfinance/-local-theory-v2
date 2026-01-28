@@ -17,8 +17,13 @@ export default function Projects() {
 
   const fetchProjects = async () => {
     setLoading(true)
-    const { data } = await supabase.from('projects').select('*').order('created_at', { ascending: false })
-    setProjects(data || [])
+    // Wrap in try-catch to prevent crash
+    try {
+        const { data } = await supabase.from('projects').select('*').order('created_at', { ascending: false })
+        setProjects(data || [])
+    } catch (e) {
+        console.error(e)
+    }
     setLoading(false)
   }
 
