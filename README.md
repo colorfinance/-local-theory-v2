@@ -18,4 +18,4 @@ Rebuild the digital agency dashboard with a premium, high-performance stack. Rep
 6.  **Content Calendar:** Schedule and plan social posts.
 
 ## Database Schema
-(See schema.sql for the Supabase structure)
+(See schema.sql for the Supabase structure) - Triggering redeploy.
