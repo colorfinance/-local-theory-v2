@@ -21,21 +21,22 @@ export default function AIAudit() {
     setTimeout(() => setStep('analyzing'), 2000)
 
     try {
-      // Logic: In prod, we'd hit /api/audit which uses Gemini
-      // For this UI build, we mock a high-fidelity result
-      setTimeout(() => {
-        setReport({
-          score: 84,
-          url: url.replace('https://', '').replace('http://', ''),
-          findings: [
-            { category: 'SEO', status: 'warning', title: 'Missing Meta Descriptions', detail: '3 pages are missing descriptions which hurts click-through rates.' },
-            { category: 'Performance', status: 'success', title: 'Lightning Fast Load', detail: 'Site loads in 0.8s, which is top 5% in the industry.' },
-            { category: 'Conversion', status: 'error', title: 'Weak CTA Placement', detail: 'The primary "Buy Now" button is below the fold on mobile.' }
-          ]
-        })
-        setStep('finished')
-        setLoading(false)
-      }, 4500)
+      const res = await fetch('/api/audit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url })
+      })
+
+      if (!res.ok) throw new Error('Failed')
+
+      const data = await res.json()
+      setReport({
+        score: data.score,
+        url: url.replace('https://', '').replace('http://', ''),
+        findings: data.findings
+      })
+      setStep('finished')
+      setLoading(false)
     } catch (error) {
       alert("Audit failed. Try again later.")
       setLoading(false)
