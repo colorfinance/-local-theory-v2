@@ -151,7 +151,8 @@ export default function ProjectBoard() {
                                                         </div>
                                                     </motion.div>
                                                 )}
-                                            </Draggable>\n                                        ))}
+                                            </Draggable>
+                                        ))}
                                         {provided.placeholder}
                                     </div>
                                 )}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import Sidebar from '../../components/Sidebar'
+import Sidebar from '../components/Sidebar'
 import { supabase } from '../../lib/supabaseClient'
 import { FileText, Plus, DollarSign, Send, Trash2, CheckCircle, Clock, Eye, Loader2 } from 'lucide-react'
 

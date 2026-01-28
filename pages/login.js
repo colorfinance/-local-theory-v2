@@ -88,7 +88,8 @@ export default function Login() {
                 className="mt-8 p-4 bg-white/5 rounded-2xl border border-white/5 text-center text-xs font-bold text-[#A78BFA] uppercase tracking-widest"
             >
                 {message}
-            </motion.div>\n        )}
+            </motion.div>
+        )}
       </motion.div>
     </div>
   )

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import Sidebar from '../../components/Sidebar'
+import Sidebar from '../components/Sidebar'
 import { Globe, ShieldCheck, Zap, BarChart3, ArrowRight, Loader2, Target, Cpu, TrendingUp } from 'lucide-react'
 
 const container = {
