@@ -1,16 +1,17 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
+import { motion, AnimatePresence } from 'framer-motion'
 import Sidebar from '../../components/Sidebar'
 import { supabase } from '../../lib/supabaseClient'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
-import { Plus, MoreHorizontal } from 'lucide-react'
+import { Plus, MoreHorizontal, Layout, ChevronLeft, Target } from 'lucide-react'
 
 export default function ProjectBoard() {
   const router = useRouter()
   const { id } = router.query
   const [project, setProject] = useState(null)
-  const [columns, setColumns] = useState({}) // { colId: [tasks] }
-  const [colOrder, setColOrder] = useState([]) // [colId, colId]
+  const [columns, setColumns] = useState({})
+  const [colOrder, setColOrder] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -18,17 +19,12 @@ export default function ProjectBoard() {
   }, [id])
 
   const fetchBoard = async () => {
-    // 1. Get Project
     const { data: proj } = await supabase.from('projects').select('*').eq('id', id).single()
     setProject(proj)
 
-    // 2. Get Columns
     const { data: cols } = await supabase.from('project_columns').select('*').eq('project_id', id).order('order_index')
-    
-    // 3. Get Tasks
     const { data: tasks } = await supabase.from('project_tasks').select('*').in('column_id', cols.map(c => c.id)).order('order_index')
 
-    // Structure Data
     const colMap = {}
     cols.forEach(c => {
         colMap[c.id] = { ...c, tasks: tasks.filter(t => t.column_id === c.id) }
@@ -40,31 +36,24 @@ export default function ProjectBoard() {
   }
 
   const onDragEnd = async (result) => {
-    const { destination, source, draggableId } = result
+    const { destination, source } = result
     if (!destination) return
     if (destination.droppableId === source.droppableId && destination.index === source.index) return
 
     const startCol = columns[source.droppableId]
     const finishCol = columns[destination.droppableId]
 
-    // Moving within same column
     if (startCol === finishCol) {
         const newTasks = Array.from(startCol.tasks)
         const [movedTask] = newTasks.splice(source.index, 1)
         newTasks.splice(destination.index, 0, movedTask)
-
-        const newCol = { ...startCol, tasks: newTasks }
-        setColumns({ ...columns, [newCol.id]: newCol })
-        
-        // Save to DB (Update order_index for all affected)
-        // Optimization: In prod, batch update. Here simple loop.
+        setColumns({ ...columns, [startCol.id]: { ...startCol, tasks: newTasks } })
         newTasks.forEach(async (t, i) => {
             await supabase.from('project_tasks').update({ order_index: i }).eq('id', t.id)
         })
         return
     }
 
-    // Moving to different column
     const startTasks = Array.from(startCol.tasks)
     const [movedTask] = startTasks.splice(source.index, 1)
     const finishTasks = Array.from(finishCol.tasks)
@@ -75,50 +64,63 @@ export default function ProjectBoard() {
         [startCol.id]: { ...startCol, tasks: startTasks },
         [finishCol.id]: { ...finishCol, tasks: finishTasks }
     })
-
-    // Save DB
     await supabase.from('project_tasks').update({ column_id: finishCol.id }).eq('id', movedTask.id)
   }
 
   const addTask = async (colId) => {
     const title = prompt("Task Name:")
     if (!title) return
-
     const { data } = await supabase.from('project_tasks').insert({
         column_id: colId,
         title: title,
-        description: '',
         order_index: columns[colId].tasks.length
     }).select().single()
-
     if (data) {
-        const newCol = { ...columns[colId], tasks: [...columns[colId].tasks, data] }
-        setColumns({ ...columns, [colId]: newCol })
+        setColumns({ ...columns, [colId]: { ...columns[colId], tasks: [...columns[colId].tasks, data] } })
     }
   }
 
-  if (loading) return <div className="min-h-screen bg-lt-bg text-white pl-64 p-8">Loading Board...</div>
+  if (loading) return null
 
   return (
-    <div className="min-h-screen bg-lt-bg text-white pl-64 flex flex-col">
+    <div className="min-h-screen bg-lt-bg text-white pl-72 flex flex-col font-sans">
       <Sidebar />
       
       {/* Header */}
-      <header className="h-16 border-b border-lt-border flex items-center px-8 bg-lt-bg sticky top-0 z-10">
-        <h1 className="font-bold text-lg">{project?.title}</h1>
+      <header className="h-24 border-b border-white/5 flex items-center justify-between px-12 bg-[#080808]/80 backdrop-blur-xl sticky top-0 z-30">
+        <div className="flex items-center gap-6">
+            <button onClick={() => router.push('/projects')} className="p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-all text-lt-muted hover:text-white">
+                <ChevronLeft size={20} />
+            </button>
+            <div>
+                <span className="text-[10px] font-black text-lt-primary uppercase tracking-[0.3em] mb-1 block px-1">Tactical Deployment</span>
+                <h1 className="text-2xl font-black italic tracking-tighter uppercase">{project?.title}</h1>
+            </div>
+        </div>
+        <div className="flex items-center gap-4">
+            <div className="flex -space-x-2">
+                {[1,2,3].map(i => <div key={i} className="w-8 h-8 rounded-full border-2 border-lt-bg bg-lt-surface flex items-center justify-center text-[10px] font-bold">JD</div>)}
+            </div>
+            <button className="bg-white/5 p-3 rounded-xl hover:bg-white/10 transition-all text-lt-muted">
+                <MoreHorizontal size={20} />
+            </button>
+        </div>
       </header>
 
       {/* Kanban Board */}
-      <main className="flex-1 overflow-x-auto p-8">
+      <main className="flex-1 overflow-x-auto p-12 bg-[radial-gradient(circle_at_top_right,rgba(109,40,217,0.05),transparent)]">
         <DragDropContext onDragEnd={onDragEnd}>
-            <div className="flex gap-6 h-full items-start">
+            <div className="flex gap-8 h-full items-start">
                 {colOrder.map(colId => {
                     const column = columns[colId]
                     return (
-                        <div key={colId} className="w-80 flex-shrink-0 bg-lt-card border border-lt-border rounded-xl flex flex-col max-h-[80vh]">
-                            <div className="p-4 font-bold flex justify-between items-center border-b border-lt-border">
-                                {column.title}
-                                <span className="text-xs bg-lt-surface px-2 py-1 rounded text-lt-muted">{column.tasks.length}</span>
+                        <div key={colId} className="w-96 flex-shrink-0 flex flex-col max-h-[85vh]">
+                            <div className="px-4 py-3 flex justify-between items-center mb-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-lt-primary" />
+                                    <h3 className="font-black italic tracking-wider text-sm uppercase">{column.title}</h3>
+                                </div>
+                                <span className="font-mono text-[10px] bg-white/5 px-2 py-1 rounded text-lt-muted font-bold tracking-tighter">{column.tasks.length} UNIT(S)</span>
                             </div>
                             
                             <Droppable droppableId={colId}>
@@ -126,33 +128,43 @@ export default function ProjectBoard() {
                                     <div 
                                         {...provided.droppableProps} 
                                         ref={provided.innerRef}
-                                        className="p-3 flex-1 overflow-y-auto space-y-3 min-h-[100px]"
+                                        className="flex-1 overflow-y-auto space-y-4 min-h-[150px] px-1 pb-6"
                                     >
                                         {column.tasks.map((task, index) => (
                                             <Draggable key={task.id} draggableId={task.id} index={index}>
-                                                {(provided) => (
-                                                    <div
+                                                {(provided, snapshot) => (
+                                                    <motion.div
                                                         ref={provided.innerRef}
                                                         {...provided.draggableProps}
                                                         {...provided.dragHandleProps}
-                                                        className="bg-lt-surface border border-lt-border p-3 rounded-lg hover:border-lt-primary/50 transition-colors shadow-sm"
+                                                        style={{ ...provided.draggableProps.style }}
+                                                        className={`glass-card p-5 rounded-2xl group cursor-grab active:cursor-grabbing transition-all duration-300 ${snapshot.isDragging ? 'shadow-[0_20px_50px_rgba(0,0,0,0.5)] border-lt-primary/50' : 'hover:border-white/20'}`}
                                                     >
-                                                        <div className="font-medium text-sm mb-1">{task.title}</div>
-                                                    </div>
+                                                        <div className="flex justify-between items-start mb-3">
+                                                            <span className="text-[9px] font-bold text-lt-muted tracking-widest uppercase px-2 py-0.5 bg-white/5 rounded">TASK_ID_{task.id.slice(0,4)}</span>
+                                                            <Target size={12} className="text-lt-muted group-hover:text-lt-primary transition-colors" />
+                                                        </div>
+                                                        <div className="font-bold text-sm text-gray-200 leading-snug">{task.title}</div>
+                                                        <div className="mt-4 pt-4 border-t border-white/5 flex items-center justify-between">
+                                                            <div className="w-6 h-6 rounded-full bg-lt-surface border border-white/10" />
+                                                            <div className="text-[9px] font-mono text-lt-muted uppercase">Priority_MED</div>
+                                                        </div>
+                                                    </motion.div>
                                                 )}
-                                            </Draggable>
-                                        ))}
+                                            </Draggable>\n                                        ))}
                                         {provided.placeholder}
                                     </div>
                                 )}
                             </Droppable>
 
-                            <button 
+                            <motion.button 
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
                                 onClick={() => addTask(colId)}
-                                className="p-3 text-sm text-lt-muted hover:text-white hover:bg-lt-surface transition-colors border-t border-lt-border flex items-center gap-2"
+                                className="mt-2 p-4 text-[10px] font-black tracking-[0.2em] text-lt-muted hover:text-white bg-white/5 hover:bg-white/10 rounded-2xl border border-dashed border-white/10 transition-all flex items-center justify-center gap-2"
                             >
-                                <Plus size={16} /> Add Card
-                            </button>
+                                <Plus size={14} /> ADD COMPONENT
+                            </motion.button>
                         </div>
                     )
                 })}
