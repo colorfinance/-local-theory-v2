@@ -1,6 +1,21 @@
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
+import { supabase } from '../lib/supabaseClient'
 import Sidebar from '../components/Sidebar'
 
 export default function Dashboard() {
+  const router = useRouter()
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) router.push('/login')
+      else setLoading(false)
+    })
+  }, [])
+
+  if (loading) return null
+
   return (
     <div className="min-h-screen bg-lt-bg text-white pl-64">
       <Sidebar />
