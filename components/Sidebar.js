@@ -1,36 +1,71 @@
 import Link from 'next/link'
-import { LayoutDashboard, Users, FileText, CheckSquare, Calendar } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { motion } from 'framer-motion'
+import { LayoutDashboard, Users, FileText, CheckSquare, Send, LogOut, ChevronRight } from 'lucide-react'
+import { supabase } from '../lib/supabaseClient'
+
+const navItems = [
+  { href: '/', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/projects', label: 'Projects', icon: CheckSquare },
+  { href: '/audits', label: 'AI Audits', icon: FileText },
+  { href: '/proposals', label: 'Proposals', icon: Send },
+  { href: '/clients', label: 'Clients', icon: Users },
+]
 
 export default function Sidebar() {
+  const router = useRouter()
+  
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+    router.push('/login')
+  }
+
   return (
-    <div className="w-64 border-r border-lt-border h-screen p-4 flex flex-col fixed left-0 top-0 bg-lt-card">
-      <div className="text-xl font-bold mb-8 px-2 flex items-center gap-2">
-        <div className="w-8 h-8 bg-lt-primary rounded-lg"></div>
-        Local Theory
+    <div className="w-72 border-r border-white/5 h-screen p-6 flex flex-col fixed left-0 top-0 bg-[#080808] z-50">
+      <div className="mb-12 px-2 flex items-center gap-3">
+        <div className="w-10 h-10 bg-gradient-to-br from-lt-primary to-lt-accent rounded-xl shadow-[0_0_20px_rgba(109,40,217,0.3)] flex items-center justify-center">
+            <span className="text-white font-black text-xl italic leading-none mt-0.5 ml-0.5 text-shadow">LT</span>
+        </div>
+        <div>
+            <h2 className="text-lg font-black italic tracking-tighter text-white leading-tight">LOCAL THEORY</h2>
+            <span className="text-[10px] text-lt-muted font-bold tracking-[0.2em] uppercase opacity-60">Digital Engine</span>
+        </div>
       </div>
       
-      <nav className="space-y-1">
-        <Link href="/" className={`flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition ${isActive('/') ? 'text-white bg-lt-surface' : 'text-lt-muted hover:text-white hover:bg-lt-surface/50'}`}>
-          <LayoutDashboard size={18} />
-          Dashboard
-        </Link>
-        <Link href="/projects" className={`flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition ${isActive('/projects') ? 'text-white bg-lt-surface' : 'text-lt-muted hover:text-white hover:bg-lt-surface/50'}`}>
-          <CheckSquare size={18} />
-          Projects
-        </Link>
-        <Link href="/audits" className={`flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition ${isActive('/audits') ? 'text-white bg-lt-surface' : 'text-lt-muted hover:text-white hover:bg-lt-surface/50'}`}>
-          <FileText size={18} />
-          AI Audits
-        </Link>
-        <Link href="/proposals" className={`flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition ${isActive('/proposals') ? 'text-white bg-lt-surface' : 'text-lt-muted hover:text-white hover:bg-lt-surface/50'}`}>
-          <Send size={18} />
-          Proposals
-        </Link>
-        <Link href="/clients" className={`flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition ${isActive('/clients') ? 'text-white bg-lt-surface' : 'text-lt-muted hover:text-white hover:bg-lt-surface/50'}`}>
-          <Users size={18} />
-          Clients
-        </Link>
+      <nav className="flex-1 space-y-2">
+        {navItems.map((item) => {
+          const isActive = router.pathname === item.href
+          return (
+            <Link key={item.href} href={item.href} className="block relative group">
+              <div className={`flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-300 relative z-10 ${
+                isActive 
+                ? 'bg-white/5 text-white shadow-[inset_0_0_20px_rgba(255,255,255,0.02)]' 
+                : 'text-lt-muted hover:text-gray-200'
+              }`}>
+                <item.icon size={20} className={isActive ? 'text-lt-primary' : 'group-hover:text-lt-accent transition-colors'} />
+                <span className="text-sm font-bold tracking-wide">{item.label}</span>
+                {isActive && (
+                    <motion.div 
+                        layoutId="active-nav"
+                        className="absolute inset-0 bg-gradient-to-r from-lt-primary/10 to-transparent rounded-2xl -z-10 border border-white/10"
+                    />
+                )}
+                <ChevronRight size={14} className={`ml-auto opacity-0 group-hover:opacity-100 transition-all ${isActive ? 'translate-x-0' : '-translate-x-2'}`} />
+              </div>
+            </Link>
+          )
+        })}
       </nav>
+
+      <div className="mt-auto border-t border-white/5 pt-6">
+        <button 
+            onClick={handleLogout}
+            className="w-full flex items-center gap-4 px-4 py-3 text-lt-muted hover:text-red-400 hover:bg-red-500/5 rounded-2xl transition-all duration-300"
+        >
+          <LogOut size={20} />
+          <span className="text-sm font-bold tracking-wide uppercase">Sign Out</span>
+        </button>
+      </div>
     </div>
   )
 }

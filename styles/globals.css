@@ -2,7 +2,57 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --background: 0 0% 3.9%;
+  --foreground: 0 0% 98%;
+  --primary: 262.1 83.3% 57.8%;
+  --accent: 255 92% 76%;
+}
+
 body {
-  background-color: #0A0A0A;
+  background-color: #050505;
   color: #EDEDED;
+  -webkit-font-smoothing: antialiased;
+}
+
+.glass-card {
+  background: rgba(15, 15, 18, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+}
+
+.premium-glow {
+  position: relative;
+}
+
+.premium-glow::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  background: linear-gradient(135deg, rgba(109, 40, 217, 0.4), transparent, rgba(167, 139, 250, 0.2));
+  border-radius: inherit;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.premium-glow:hover::after {
+  opacity: 1;
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, #FFF 0%, #A78BFA 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
 }
