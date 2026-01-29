@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import Sidebar from '../../components/Sidebar'
-import { supabase } from '../../lib/supabaseClient'
+import Sidebar from '../components/Sidebar'
+import { supabase } from '../lib/supabaseClient'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Plus, ArrowRight, Folder } from 'lucide-react'
 

@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { motion, AnimatePresence } from 'framer-motion'
-import Sidebar from '../../components/Sidebar'
-import { supabase } from '../../lib/supabaseClient'
+import Sidebar from '@/components/Sidebar'
+import { supabase } from '@/lib/supabaseClient'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import { Plus, MoreHorizontal, Layout, ChevronLeft, Target } from 'lucide-react'
 
